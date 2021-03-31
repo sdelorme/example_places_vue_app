@@ -15,8 +15,24 @@
       {{ place.name }}
       <br />
       {{ place.address }}
+      <br />
+      <button v-on:click="showPlace(place)">Click for more info</button>
       <hr />
     </div>
+    <dialog id="place-details">
+      <form method="dialog">
+        <p>
+          Name:
+          <input v-model="currentPlace.name" />
+        </p>
+        <p>
+          Address:
+          <input v-model="currentPlace.address" />
+        </p>
+        <button v-on:click="updatePlace(currentPlace)">Update Place Info</button>
+        <button>Close</button>
+      </form>
+    </dialog>
   </div>
 </template>
 
@@ -31,6 +47,7 @@ export default {
       places: [],
       newPlaceName: "",
       newPlaceAddress: "",
+      currentPlace: {},
     };
   },
   created: function () {
@@ -53,6 +70,20 @@ export default {
         this.places.push(response.data);
         this.newPlaceName = "";
         this.newPlaceAddress = "";
+      });
+    },
+    showPlace: function (place) {
+      this.currentPlace = place;
+      document.querySelector("#place-details").showModal();
+    },
+    updatePlace: function (place) {
+      var params = {
+        name: this.newPlaceName,
+        address: this.newPlaceAddress,
+      };
+      axios.patch("/api/places/" + place.id, params).then((response) => {
+        console.log("updating place", response);
+        this.currentPlace = {};
       });
     },
   },
